@@ -43,7 +43,7 @@ vector* vector_create_with_size(size_t s) {
         return NULL;
     }
 
-    if(vector_init_with_size(v, s) == NULL) {
+    if(!vector_init_with_size(v, s)) {
         free(v);
         return NULL;
     }
