@@ -9,6 +9,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#define SERVER_PORT 8080
+
 // logg(out, format, ...)
 // Writes the string from @format to the @out pointer, extendable for
 // additional parameters.

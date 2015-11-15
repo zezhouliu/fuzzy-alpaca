@@ -1,5 +1,8 @@
 #include "vector.h"
 
+#include <stdbool.h>
+#include <stdlib.h>
+
 // Private
 
 const size_t INIT_VEC_SIZE = 16;

@@ -1,5 +1,7 @@
 #include "events.h"
 
+#include <stdlib.h>
+
 #define POLL_TIMEOUT 10000
 
 pollsocket_t* pollsocket_create(vector* sockets) {
@@ -27,7 +29,7 @@ pollsocket_t* pollsocket_create(vector* sockets) {
     // Create a pollsocket_t* with valid descriptors
     pollsocket_t* ps = calloc(1, sizeof(pollsocket_t));
     if (ps == NULL){
-        log_error("%s, %d: Could not malloc for pollsocket_t\n", __func__, __LINE__);
+        log_err("%s, %d: Could not malloc for pollsocket_t\n", __func__, __LINE__);
         return NULL;
     }
 
@@ -113,8 +115,8 @@ pollsocket_t* pollsocket_validate(pollsocket_t* ps) {
 
 int poll_sockets(pollsocket_t* ps, int timeout) {
     // if valid pollsockets and count > 0
-    if (!ps) {
-        log_error("%s, %d: Error invalid ufds\n", __func__, __LINE__);
+    if (ps == NULL) {
+        log_err("%s, %d: Error invalid ufds\n", __func__, __LINE__);
         return -1;
     }
 
@@ -137,7 +139,7 @@ vector* poll_response(pollsocket_t* ps)
 {
     if (ps == NULL)
     {
-        log_error("%s, %d: Error invalid ps\n", __func__, __LINE__);
+        log_err("%s, %d: Error invalid ps\n", __func__, __LINE__);
         return NULL;
     }
     vector* sockets = ps->sockets;
@@ -170,7 +172,7 @@ vector* poll_response(pollsocket_t* ps)
 
         if (pfds[i].revents == POLLERR)
         {
-            log_out("POLLING ERROR on S(%d)\n", pfds[i].fd);
+            log_err("POLLING ERROR on S(%d)\n", pfds[i].fd);
             continue;
         }
 

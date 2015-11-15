@@ -1,5 +1,10 @@
 #include "sockets.h"
 
+#include <assert.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+
 socket_t * socket_startup(unsigned short port) {
     errno = 0;
 
@@ -33,7 +38,7 @@ socket_t * socket_startup(unsigned short port) {
     // s->fd = socket(PF_INET, SOCK_STREAM, 0);
     s->fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     if (s->fd < 0) {
-        log_error("%s:L %d: could not create socket", __func__, __LINE__);
+        log_err("%s:L %d: could not create socket", __func__, __LINE__);
         goto failure;
     }
 
@@ -49,13 +54,13 @@ socket_t * socket_startup(unsigned short port) {
     int rc = setsockopt(s->fd, SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on));
     if (rc < 0)
     {
-        log_error("%s:L %d: could not set as reusable");
+        log_err("%s:L %d: could not set as reusable");
         goto failure;
     }
     int r_nonblocking = fcntl(s->fd, F_SETFL, O_NONBLOCK);
     if (r_nonblocking < 0)
     {
-        log_error("%s:L %d: could not set as nonblocking");
+        log_err("%s:L %d: could not set as nonblocking");
         goto failure;
     }
 
@@ -63,7 +68,7 @@ socket_t * socket_startup(unsigned short port) {
     // if (bind(s->fd, (struct sockaddr *)&(s->name), sizeof(s->name)) < 0)
     if (bind(s->fd, res->ai_addr, res->ai_addrlen) < 0)
     {
-        log_error("%s:L %d: could not bind socket", __func__, __LINE__);
+        log_err("%s:L %d: could not bind socket", __func__, __LINE__);
         goto failure;
     }
 
@@ -71,20 +76,20 @@ socket_t * socket_startup(unsigned short port) {
     // NOTE: If s.fd is valid socket, this call CANNOT fail
     if (listen(s->fd, 5) < 0)
     {
-        log_error("%s:L %d: could not listen to invalid socket: %d", __func__, __LINE__, s->fd);
+        log_err("%s:L %d: could not listen to invalid socket: %d", __func__, __LINE__, s->fd);
         goto failure;
     }
 
     // If all succeeds, assign server status as OPEN
     s->status = SOCKET_OPEN;
 
-    log_out("Server: 127.0.0.1 @%d\n", s->port);
+    log_info("Server: 127.0.0.1 @%d\n", s->port);
 
     return s;
 
     // Here we handle all error cases
     failure:
-        log_out("Failure in socket_startup\n");
+        log_info("Failure in socket_startup\n");
         if (s->fd >= 0) {
             close(s->fd);
         }
@@ -130,7 +135,7 @@ socket_t* socket_accept(socket_t* s) {
     new_socket->port = 0;
     // Error?
     if (new_socket->fd < 0){
-        log_error("%s, %d: Could not create socket\n", __func__, __LINE__);
+        log_err("%s, %d: Could not create socket\n", __func__, __LINE__);
         free(new_socket);
         return NULL;
     }
@@ -225,7 +230,7 @@ socket_t* socket_connect(unsigned short port, char* addr) {
     s->fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     if (s->fd == -1)
     {
-        log_error("%s:L %d: could not create socket\n", __func__, __LINE__);
+        log_err("%s:L %d: could not create socket\n", __func__, __LINE__);
         assert(0);
     }
 
@@ -234,7 +239,7 @@ socket_t* socket_connect(unsigned short port, char* addr) {
     // Try to bind the socket
     if (result < 0)
     {
-        log_error("%s:L %d: could not connect client, %d\n", __func__, __LINE__, result);
+        log_err("%s:L %d: could not connect client, %d\n", __func__, __LINE__, result);
         assert(0);
     }
 
