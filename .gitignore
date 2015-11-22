@@ -1,3 +1,5 @@
 *.o
 *.swp
-.deps/*
+*.deps/*
+
+.DS_Store
