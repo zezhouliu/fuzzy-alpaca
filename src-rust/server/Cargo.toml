@@ -1,0 +1,11 @@
+[package]
+name = "server"
+version = "0.1.0"
+authors = ["zezhouliu <zezhouliu1@gmail.com>"]
+
+description = "Simple secure web server implementation in rust."
+repository = "https://github.com/zezhouliu/fuzzy-alpaca"
+readme = "../README.md"
+
+[dependencies]
+ansi_term = "*"
