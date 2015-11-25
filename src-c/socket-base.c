@@ -12,6 +12,6 @@ int socket_get_fd(socket_t* s)
 {
     if (s != NULL && s->status == SOCKET_OPEN) {
         return s->fd;
-    } 
+    }
     return -1;
 }
