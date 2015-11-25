@@ -1,4 +1,4 @@
-use std::net::{TcpListener};
+use std::net::{TcpListener, TcpStream};
 use std::thread;
 
 enum SStatus {
@@ -9,6 +9,7 @@ enum SStatus {
 
 pub struct Socket {
     fd: TcpListener,
+    stream: TcpStream,
     status: SStatus
 }
 
@@ -21,6 +22,17 @@ impl Socket {
         return self.fd;
     }
 
+    fn getStream(&self) -> TcpStream {
+        return self.stream;
+    }
+
+    fn write(&self, buf) -> Result<usize> {
+        return self.stream.write(buf);
+    }
+
+    fn read(&self, buf) -> Result<usize> {
+        return self.stream.read(&mut buf);
+    }
 }
 
 
