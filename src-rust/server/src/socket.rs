@@ -1,40 +1,42 @@
-use std::net::{TcpListener, TcpStream};
-use std::thread;
+use std::net::{TcpListener};
 
-enum SStatus {
-    Socket_Open = 1,
-    Socket_Closed = 2,
-    Socket_Invalid = 3
+/*
+pub enum SStatus {
+    SocketOpen = 1,
+    SocketClosed = 2,
+    SocketInvalid = 3
 }
+*/
 
 pub struct Socket {
-    fd: TcpListener,
+    pub port: i32,
+    pub addr: String,
+    // pub status: SStatus,
+    fd: TcpListener
+    /*
     stream: TcpStream,
-    status: SStatus
+    */
+
 }
 
 impl Socket {
-    fn getStatus(&self) -> SStatus {
-        return self.status;
+    // Constructor
+    pub fn new() -> Socket {
+        Socket {
+            port: 8080,
+            addr: "127.0.0.1".to_string(),
+            fd: TcpListener::bind("127.0.0.1:8080").unwrap(),
+            // status: SStatus::SocketClosed,
+        }
     }
 
-    fn getFD(&self) -> TcpListener {
-        return self.fd;
-    }
-
-    fn getStream(&self) -> TcpStream {
-        return self.stream;
-    }
-
-    fn write(&self, buf) -> Result<usize> {
-        return self.stream.write(buf);
-    }
-
-    fn read(&self, buf) -> Result<usize> {
-        return self.stream.read(&mut buf);
+    pub fn get_listener(&self) -> TcpListener {
+        /*
+        match self.status {
+            SStatus::SocketOpen => return self.fd.try_clone().unwrap(),
+            _ => None
+        }
+        */
+        return self.fd.try_clone().unwrap();
     }
 }
-
-
-
-

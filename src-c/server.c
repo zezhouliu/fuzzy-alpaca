@@ -54,7 +54,7 @@ socket_t* server_sock;
  * @Brief: response_header generates the HTTP header for the response.
  *     It should require an input HTTP status, and possibly an [opt] content length.
  * @param[in]: status, int for HTTP status code
- * @param[in]: content_length, int for length of body 
+ * @param[in]: content_length, int for length of body
  * @return  char* for HTTP response header
  */
 char* response_header (int status, int content_type, int content_length)
@@ -339,7 +339,7 @@ int url_cb (http_parser *p, const char *at, size_t len)
  *
  * @Brief: Parses the request from socket s using HTTP-Parser.
  * @param[s]: s, socket_t* from which to receive the request.
- * 
+ *
  **/
 int parse_request(socket_t* s)
 {

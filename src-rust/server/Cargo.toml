@@ -8,4 +8,5 @@ repository = "https://github.com/zezhouliu/fuzzy-alpaca"
 readme = "../README.md"
 
 [dependencies]
-ansi_term = "*"
+bufstream = "*"
+http-muncher = "*"
