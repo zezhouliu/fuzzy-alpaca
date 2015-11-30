@@ -4,7 +4,7 @@ extern crate http_muncher;
 use std::error::Error;
 use std::io::prelude::*;
 use std::fs::File;
-use std::net::{TcpListener, TcpStream};
+use std::net::{TcpStream};
 use std::str;
 
 pub struct HttpHandler {
@@ -12,13 +12,13 @@ pub struct HttpHandler {
 }
 
 impl HttpHandler {
-    pub fn new (mut stream: TcpStream) -> HttpHandler {
+    pub fn new (stream: TcpStream) -> HttpHandler {
         HttpHandler {
             stream: stream
         }
     }
 
-    pub fn response_header (&self, status: i32, length: usize) -> String {
+    pub fn response_header (&self, length: usize) -> String {
         let mut header = "HTTP/1.1 200 OK\r\n".to_string();
         header.push_str("Content-Type: text/html\r\n");
         header.push_str("Connection: Keep-Alive\r\n");
@@ -76,17 +76,24 @@ impl http_muncher::ParserHandler for HttpHandler {
         let mut contents = String::new();
         match f.read_to_string(&mut contents) {
             Err(e) => panic!("Couldn't read {}: {}", &filepath, Error::description(&e)),
-            Ok(_) => println!("Content: {}", contents),
+            // Ok(_) => println!("Content: {}", contents),
+            Ok(_) => (),
         }
 
         // Prepare the response header
-        let status = 200;
         let len = contents.len();
-        let header = self.response_header(status, len);
-        self.stream.write(header.as_bytes());
+        let header = self.response_header(len);
+        let _ = match self.stream.write(header.as_bytes()) {
+            Err(e) => panic!("Unable to write header: {}", Error::description(&e)),
+            Ok(_) => {},
+        };
+
 
         // Write back to the stream
-        self.stream.write(contents.as_bytes());
+        let _ = match self.stream.write(contents.as_bytes()) {
+            Err(e) => panic!("Unable to write content: {}", Error::description(&e)),
+            Ok(_) => {},
+        };
 
         return true;
     }
