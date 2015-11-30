@@ -1,8 +1,33 @@
 extern crate http_muncher;
 
 // use http_muncher;
+use std::error::Error;
+use std::io::prelude::*;
+use std::fs::File;
+use std::net::{TcpListener, TcpStream};
 use std::str;
-pub struct HttpHandler;
+
+pub struct HttpHandler {
+    stream: TcpStream
+}
+
+impl HttpHandler {
+    pub fn new (mut stream: TcpStream) -> HttpHandler {
+        HttpHandler {
+            stream: stream
+        }
+    }
+
+    pub fn response_header (&self, status: i32, length: usize) -> String {
+        let mut header = "HTTP/1.1 200 OK\r\n".to_string();
+        header.push_str("Content-Type: text/html\r\n");
+        header.push_str("Connection: Keep-Alive\r\n");
+        header.push_str("Content-Length: ");
+        header.push_str(&(length.to_string()));
+        header.push_str("\r\n\r\n");
+        return header;
+    }
+}
 
 impl http_muncher::ParserHandler for HttpHandler {
 
@@ -32,7 +57,47 @@ impl http_muncher::ParserHandler for HttpHandler {
             Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
         };
 
-        println!("url:\t {}", s);
+        // Create the full filepath to read back
+        let mut filepath = "static".to_string();
+
+        // Check if it was the empty path (home)
+        match s.as_ref() {
+            "/" => filepath.push_str("/index.html"),
+            _ => filepath.push_str(s),
+        }
+
+        // Open the file path
+        let mut f = match File::open(&filepath) {
+            Err(e) => panic!("Couldnt open file {}: {}", &filepath, Error::description(&e)),
+            Ok(file) => file,
+        };
+
+        // Read the file contents
+        let mut contents = String::new();
+        match f.read_to_string(&mut contents) {
+            Err(e) => panic!("Couldn't read {}: {}", &filepath, Error::description(&e)),
+            Ok(_) => println!("Content: {}", contents),
+        }
+
+        // Prepare the response header
+        let status = 200;
+        let len = contents.len();
+        let header = self.response_header(status, len);
+        self.stream.write(header.as_bytes());
+
+        // Write back to the stream
+        self.stream.write(contents.as_bytes());
+
+        return true;
+    }
+
+    fn on_status(&mut self, status: &[u8]) -> bool {
+        let s = match str::from_utf8(status) {
+            Ok(v) => v,
+            Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+        };
+
+        println!("status:\t {}", s);
         return true;
     }
 }
