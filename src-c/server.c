@@ -1,26 +1,25 @@
-/* Secure web server in C
- * CS263 Project
+/* Minimal verified web server
+ * CS260r Project
+ * Adapted from tinyhttpd
  */
 
 #include <unistd.h>
 #include <ctype.h>
-#include <fcntl.h>
 #include <strings.h>
 #include <string.h>
-#include <stdlib.h>
 
 #include <sys/socket.h>
-#include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <poll.h>
 
+#include "utils.h"
+#include "sockets.h"
 #include "events.h"
 #include "http-parser/http_parser.h"
-#include "sockets.h"
-#include "utils.h"
 
 #define ISspace(x) isspace((int)(x))
 
@@ -54,7 +53,7 @@ socket_t* server_sock;
  * @Brief: response_header generates the HTTP header for the response.
  *     It should require an input HTTP status, and possibly an [opt] content length.
  * @param[in]: status, int for HTTP status code
- * @param[in]: content_length, int for length of body
+ * @param[in]: content_length, int for length of body 
  * @return  char* for HTTP response header
  */
 char* response_header (int status, int content_type, int content_length)
@@ -225,8 +224,7 @@ int url_cb (http_parser *p, const char *at, size_t len)
             }
 
             // Check for read-permissions
-            // if (!((st.st_mode & S_IRUSR) || (st.st_mode & S_IRGRP) || (st.st_mode & S_IROTH))) 
-            if (!(st.st_mode & S_IRUSR) && (st.st_mode & S_IROTH)) 
+            if (!((st.st_mode & S_IRUSR) || (st.st_mode & S_IRGRP) || (st.st_mode & S_IROTH))) 
             {
                 // If not permissions, then return forbidden
                 r_head = response_header(HTTP_STATUS_FORBIDDEN, 0, 0);
@@ -339,7 +337,7 @@ int url_cb (http_parser *p, const char *at, size_t len)
  *
  * @Brief: Parses the request from socket s using HTTP-Parser.
  * @param[s]: s, socket_t* from which to receive the request.
- *
+ * 
  **/
 int parse_request(socket_t* s)
 {
@@ -589,11 +587,11 @@ int main(void)
         int result = poll_sockets(ps, 5000);
         if (result < 0)
         {
-            log_err("%s, %d: polling error!\n", __func__, __LINE__);
+            log_error("%s, %d: polling error!\n", __func__, __LINE__);
         }
         else if (result == 0)
         {
-            log_info("%s, %d: No response from poll!\n", __func__, __LINE__);
+            log_out("%s, %d: No response from poll!\n", __func__, __LINE__);
         }
         else
         {
@@ -604,7 +602,7 @@ int main(void)
                 socket_t* s = vector_get(response_sockets, i);
                 if (s == NULL)
                 {
-                    log_err("Invalid socket\n");
+                    log_error("Invalid socket\n");
                 }
 
                 // First socket MAY be the listening socket
@@ -636,8 +634,7 @@ int main(void)
 void sigint_handler(int signum)
 {
     // do cleanups here and free all existing variables and stuff
-    log_info("Closing server on:...\n", socket_get_fd(server_sock));
+    log_out("Closing server on:...\n", socket_get_fd(server_sock));
     socket_close(server_sock);
     exit(signum);
 }
-

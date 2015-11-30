@@ -1,47 +1,49 @@
-#include <stdio.h>
-
 #include "utils.h"
 
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
 
-void logg(FILE* out, const char *format, ...) {
-#ifdef LOG
+/**
+* log(out, format)
+*
+* @Brief: Logs out a string to the outfile pointer, extendable for additional params
+* @Usage: log(stderr, "%s: line %d", __func__, __LINE__);
+**/
+void logg(FILE* out, const char *format, ...)
+{
     va_list v;
     va_start(v, format);
     vfprintf(out, format, v);
     va_end(v);
-#else
-    (void) out;
-    (void) format;
-#endif
 }
 
-void log_err(const char *format, ...) {
-#ifdef LOG_ERR
+/**
+* log_out(out, format)
+*
+* @Brief: Logs out a string to stdout, extendable for additional params
+* @Usage: log_error("%s: line %d", __func__, __LINE__);
+**/
+void log_out(const char *format, ...)
+{
+#if DEBUG_MODE
     va_list v;
     va_start(v, format);
-    fprintf(stderr, ANSI_COLOR_RED);
-    vfprintf(stderr, format, v);
-    fprintf(stderr, ANSI_COLOR_RESET);
-    va_end(v);
-#else
-    (void) format;
-#endif
-}
-
-void log_info(const char *format, ...) {
-#ifdef LOG_INFO
-    va_list v;
-    va_start(v, format);
-    fprintf(stdout, ANSI_COLOR_GREEN);
     vfprintf(stdout, format, v);
-    fprintf(stdout, ANSI_COLOR_RESET);
-    fflush(stdout);
     va_end(v);
 #else
+    // Clean up compiler warning
     (void) format;
 #endif
 }
 
+/**
+* log_error(format)
+*
+* @Brief: Logs out a string to stderr, extendable for additional params
+* @Usage: log_error("%s: line %d", __func__, __LINE__);
+**/
+void log_error(const char *format, ...)
+{
+    va_list v;
+    va_start(v, format);
+    vfprintf(stderr, format, v);
+    va_end(v);
+}

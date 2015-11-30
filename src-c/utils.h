@@ -1,37 +1,46 @@
-// utils.h
-//
-// Provides utility and helper functions that may be useful throughout.
-// Includes debugging tools.
+/**
+* utils.h
+*
+* @Brief: Utilites file including helper functions, i.e., debugging tools
+*/
 
-#ifndef __UTILS_H__
-#define __UTILS_H__
+#pragma once
 
+
+#define DEBUG_MODE 1
+//Headers for variable arguments
 #include <stdarg.h>
+//Standard IO Operations
 #include <stdio.h>
+//Memory Allocations
+#include <stdlib.h>
+//Errno numbers (*NIX only)
+#include <errno.h>
+//integers of variables sizes
+#include <stdint.h>
+//String and generic array operations
+#include <string.h>
+//Assertations
+#include <assert.h>
+//Boolean variables
+#include <stdbool.h>
 
 #define SERVER_PORT 8080
 
-// logg(out, format, ...)
-// Writes the string from @format to the @out pointer, extendable for
-// additional parameters.
-//
-// Usage: logg(stderr, "%s: error at line: %d", __func__, __LINE__);
 void logg(FILE* out, const char *format, ...);
+void log_out(const char *format, ...);
+void log_error(const char *format, ...);
 
-// log_err(format, ...)
-// Writes the string from @format to stderr, extendable for
-// additional parameters. Like cs165_log, but specifically to stderr.
-//
-// Usage: log_err("%s: error at line: %d", __func__, __LINE__);
-void log_err(const char *format, ...);
 
-// log_info(format, ...)
-// Writes the string from @format to stderr, extendable for
-// additional parameters. Like cs165_log, but specifically to stdout.
-// Only use this when appropriate (e.g., denoting a specific checkpoint),
-// else defer to using printf.
-//
-// Usage: log_info("Command received: %s", command_string);
-void log_info(const char *format, ...);
 
-#endif /* __UTILS_H__ */
+/*@
+    predicate IsEqualVoid{A, B}(void ** data, integer n, void ** ndata) =
+        \forall integer i; 0 <= i < n ==> \at(data[i], A) == \at(ndata[i], B);
+
+    lemma EqualityReflexive{T} :
+        \forall void ** d; \forall integer n; IsEqualVoid{T,T}(d, n, d);
+
+    lemma EqualityCommutative{S, T} :
+        \forall void ** d, ** n; \forall integer num;
+            IsEqualVoid{S, T}(d, num, n) ==> IsEqualVoid{T, S}(n, num, d);
+ */

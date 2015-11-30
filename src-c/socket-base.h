@@ -4,8 +4,7 @@
  * @Brief: Base for socket wrapper
  */
 
-#ifndef __SOCKET_BASE_H__
-#define __SOCKET_BASE_H__
+#pragma once
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -33,25 +32,5 @@ typedef struct socket_ {
     unsigned short port;
 } socket_t;
 
-/**
-* socket_get_status(s)
-*
-* @Brief returns the status of s
-* @param[in]: s, socket_t*
-* @pre: s is a valid socket_t*
-* return: sstatus_t representing status of s
-**/
 sstatus_t socket_get_status(socket_t* s);
-
-/**
-* socket_get_fd(s)
-*
-* @Brief returns the file descriptor associated with s
-* @param[in]: s, socket_t*
-* @pre: s is a valid socket_t*
-* @pre: s.status = SOCKET_OPEN
-* return: int fd if valid, else -1
-**/
 int socket_get_fd(socket_t* s);
-#endif /* __SOCKET_BASE_H__ */
-
