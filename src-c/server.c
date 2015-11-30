@@ -1,6 +1,5 @@
 /* Minimal verified web server
- * CS260r Project
- * Adapted from tinyhttpd
+ * CS263r Project
  */
 
 #include <unistd.h>
